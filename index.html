@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>Evolution Fitness – Editor de Banners</title>
 
   <link rel="manifest" href="manifest.json">
@@ -69,12 +69,9 @@ input:focus,select:focus,textarea:focus{border-color:var(--red)}
 
 /* ===================================================
    BANNERS — SISTEMA DE FONTES: Impact/Arial Black/Arial
-   SEM nenhuma dependência externa = download funciona
    =================================================== */
 .banner{display:none;width:430px;flex-direction:column;background:#0D0D0D;overflow:hidden}
 .banner.on{display:flex}
-
-/* Fonte base dos banners */
 .banner *{font-family:Impact,'Arial Black',Arial,sans-serif}
 
 /* ── BANNER 1: HORÁRIOS ── */
@@ -173,6 +170,71 @@ input:focus,select:focus,textarea:focus{border-color:var(--red)}
 .bI-ci{font-size:10px;color:rgba(255,255,255,.75);font-family:Arial,sans-serif;line-height:1.6}
 .bI-tgs{background:#1C1C1C;padding:9px 20px;display:flex;justify-content:space-between}
 .bI-tg{font-size:7px;letter-spacing:1.5px;color:rgba(255,255,255,.25)}
+
+/* ===== NOVAS MELHORIAS PARA CELULAR (USABILIDADE) ===== */
+@media (max-width: 700px) {
+  .layout {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .sb {
+    max-height: 45vh;
+    overflow-y: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--bd);
+  }
+  .pv {
+    overflow-x: auto;
+    overflow-y: visible;
+    padding: 16px 12px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .banner {
+    flex-shrink: 0;
+    margin: 0 auto;
+  }
+  .btn, .tab, .irm, .ptb button, .bg, .br {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  .tab {
+    padding: 12px 14px;
+    font-size: 13px;
+  }
+  .btn {
+    padding: 12px;
+    font-size: 14px;
+  }
+  input, select, textarea {
+    font-size: 16px;
+    padding: 10px;
+  }
+  .irow {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px;
+  }
+  .irm {
+    padding: 6px 12px;
+    font-size: 18px;
+  }
+  .ptb button.dl {
+    font-size: 16px;
+    padding: 12px 20px;
+  }
+  header {
+    padding: 8px 14px;
+  }
+  header h1 {
+    font-size: 14px;
+  }
+}
+html, body {
+  -webkit-overflow-scrolling: touch;
+}
 </style>
 </head>
 <body>
@@ -513,7 +575,7 @@ function rH(){
   if(!hs.length){c.innerHTML='<tr><td colspan="7" style="color:rgba(255,255,255,.2);padding:18px;text-align:center;font-size:10px;font-family:Arial">Adicione aulas no painel →</td></tr>';return;}
   c.innerHTML=hs.map(h=>{
     let r=`<tr><td>${h}</td>`;
-    D.forEach(d=>{r+=H[h]&&H[h][d]?`<td><span class="bH-c">${H[h][d]}</span></td>`:'<td></td>';});
+    D.forEach(d=>{r+=H[h]&&H[h][d]?`<td><span class="bH-c">${H[h][d]}</span></td>`:'<td></td>'});
     return r+'</tr>';
   }).join('');
 }
@@ -576,8 +638,8 @@ async function baixar(){
   try{
     const canvas=await html2canvas(el,{
       scale:2,
-      useCORS:false,      // sem recursos externos nos banners
-      allowTaint:false,   // canvas limpo = toDataURL funciona
+      useCORS:false,
+      allowTaint:false,
       backgroundColor:'#0D0D0D',
       logging:false,
       width:el.offsetWidth,
