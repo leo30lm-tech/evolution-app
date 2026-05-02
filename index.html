@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>Evolution Fitness – Editor de Banners</title>
 
-  <link rel="manifest" href="manifest.json">
+<link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#C8102E">
-  <link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <!-- Google Fonts APENAS para a interface, nunca para os banners -->
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700&display=swap" rel="stylesheet">
@@ -15,9 +15,15 @@
 <style>
 /* ===== VARIÁVEIS ===== */
 :root{
-  --red:#C8102E; --red2:#a00c22; --gold:#F5C01A;
-  --bg:#0A0A0A; --s1:#111; --s2:#1A1A1A; --s3:#222;
-  --bd:rgba(255,255,255,.08); --mut:#777;
+  --red:#C8102E; 
+  --red2:#a00c22; 
+  --gold:#F5C01A;
+  --bg:#0A0A0A; 
+  --s1:#111; 
+  --s2:#1A1A1A; 
+  --s3:#222;
+  --bd:rgba(255,255,255,.08); 
+  --mut:#777;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Barlow',Arial,sans-serif;background:var(--bg);color:#fff;height:100vh;overflow:hidden;display:flex;flex-direction:column}
@@ -57,7 +63,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--red)}
 .enote{color:var(--mut);font-size:11px;text-align:center;padding:12px;border:1px dashed var(--bd);border-radius:6px}
 
 /* ===== PREVIEW ===== */
-.pv{background:#181818;overflow:auto;display:flex;flex-direction:column;align-items:center;padding:20px}
+.pv{background:#181818;overflow:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
 .ptb{display:flex;gap:8px;margin-bottom:14px;align-self:stretch;justify-content:flex-end}
 .ptb button{padding:7px 15px;border-radius:6px;border:1px solid var(--bd);background:var(--s2);color:#fff;font-size:12px;font-weight:600;cursor:pointer;transition:opacity .18s}
 .ptb button:hover{opacity:.8}
@@ -70,7 +76,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--red)}
 /* ===================================================
    BANNERS — SISTEMA DE FONTES: Impact/Arial Black/Arial
    =================================================== */
-.banner{display:none;width:430px;flex-direction:column;background:#0D0D0D;overflow:hidden}
+.banner{display:none;width:430px;flex-direction:column;background:#0D0D0D;overflow-y:auto;aspect-ratio:9/16;margin:0 auto}
 .banner.on{display:flex}
 .banner *{font-family:Impact,'Arial Black',Arial,sans-serif}
 
@@ -101,7 +107,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--red)}
 .bA-hero{padding:18px 18px 8px;text-align:center}
 .bA-hj{font-size:38px;font-weight:900;letter-spacing:2px;line-height:1;color:#fff}
 .bA-ab{background:#fff;display:inline-block;padding:2px 20px;margin:4px 0}
-.bA-at{font-size:44px;font-weight:900;color:var(--red);letter-spacing:2px;line-height:1.05}
+.bA-at{font-size:44px;font-weight:900;color:var(--red);letter-spacing:2px;line-height:1.05;font-family:Impact,'Arial Black',Arial,sans-serif}
 .bA-vm{font-size:26px;letter-spacing:1px;color:rgba(255,255,255,.9);line-height:1.1}
 .bA-body{padding:12px 16px}
 .bA-mi{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}
@@ -260,6 +266,22 @@ html, body {
 <!-- ═══════════════ SIDEBAR ═══════════════ -->
 <div class="sb">
 
+  <!-- CUSTOMIZAÇÃO GLOBAL -->
+  <div class="blk">
+    <div class="sec">Personalizar Tema</div>
+    <label>Cor Principal</label><input type="color" id="theme-primary" value="#C8102E" oninput="updateTheme()">
+    <label>Cor Destaque</label><input type="color" id="theme-secondary" value="#F5C01A" oninput="updateTheme()">
+  </div>
+
+  <div class="blk">
+    <div class="sec">Proporção do Banner</div>
+    <select id="aspect-ratio" onchange="updateAspectRatio()">
+        <option value="9/16">9:16 (Story - Padrão)</option>
+        <option value="1/1">1:1 (Post Quadrado)</option>
+        <option value="4/5">4:5 (Portrait)</option>
+    </select>
+  </div>
+
   <!-- HORÁRIOS -->
   <div class="panel on" id="pH">
     <div class="blk">
@@ -413,7 +435,7 @@ O MELHOR</textarea>
 
   <!-- BANNER HOJE TEM AULA -->
   <div class="banner" id="bA">
-    <div style="border:3px solid var(--red);border-radius:12px;overflow:hidden;background:linear-gradient(180deg,#0D0D0D,#1a0608 55%,#0D0D0D)">
+    <div style="border:3px solid var(--red);border-radius:12px;overflow:hidden;background:linear-gradient(180deg,#0D0D0D,#1a0608 55%,#0D0D0D);height:100%;display:flex;flex-direction:column">
       <div class="bA-hd">
         <div class="bA-ct" id="bAct">TRÊS RIOS — RJ</div>
         <div class="bA-ac" id="bAnm">EVOLUTION FITNESS</div>
@@ -424,7 +446,7 @@ O MELHOR</textarea>
         <div class="bA-ab"><div class="bA-at">AULA!</div></div>
         <div class="bA-vm">VEM TREINAR<br>COM A GENTE</div>
       </div>
-      <div class="bA-body" id="bAmod"></div>
+      <div class="bA-body" id="bAmod" style="flex:1"></div>
       <div class="bA-cta">
         <div class="bA-ctat">NÃO PERCA — VENHA HOJE!</div>
         <div class="bA-ctap" id="bAwp">(24) 98143-3386</div>
@@ -471,7 +493,7 @@ O MELHOR</textarea>
       <div class="bP-tt" id="bPtt">EVOLUTION TOTAL</div>
       <div class="bP-sb"><span id="bPsb">ACESSO LIVRE</span></div>
     </div>
-    <div class="bP-body">
+    <div class="bP-body" style="flex:1">
       <div class="bP-lb">PLANO SEMESTRAL E ANUAL RECORRENTE<br><span style="font-size:8px;opacity:.6">(Sem comprometer o limite do seu cartão)</span></div>
       <div class="bP-cards">
         <div class="bP-card">
@@ -506,7 +528,7 @@ O MELHOR</textarea>
       <div class="bI-br" id="bInm">EVOLUTION FITNESS</div>
       <div class="bI-ct" id="bIct">TRÊS RIOS — RJ</div>
     </div>
-    <div class="bI-body">
+    <div class="bI-body" style="flex:1">
       <div class="bI-tt" id="bItt">SEU CORPO<br>MERECE<br>O MELHOR</div>
       <div class="bI-dv"></div>
       <div class="bI-ds" id="bIds">A academia que cuida de você de verdade. Atenção individual, treino no seu ritmo, professores que te conhecem pelo nome.</div>
@@ -543,6 +565,7 @@ function aba(id,el){
   el.classList.add('on');
   document.getElementById('p'+id).classList.add('on');
   document.getElementById('b'+id).classList.add('on');
+  updateAspectRatio(); // Aplica a proporção ao novo banner
 }
 
 /* === UTIL === */
@@ -550,6 +573,23 @@ const D=['SEG','TER','QUA','QUI','SEX','SAB'];
 function g(id){return document.getElementById(id)}
 function sv(dst,src){const d=g(dst);const s=g(src);if(d&&s)d.textContent=s.value}
 function sh(dst,src){const d=g(dst);const s=g(src);if(d&&s)d.innerHTML=s.value.replace(/\n/g,'<br>')}
+
+/* === PERSONALIZAÇÃO DE CORES === */
+function updateTheme() {
+    const primary = document.getElementById('theme-primary').value;
+    const secondary = document.getElementById('theme-secondary').value;
+    document.documentElement.style.setProperty('--red', primary);
+    document.documentElement.style.setProperty('--gold', secondary);
+}
+
+/* === PROPORÇÃO DO BANNER === */
+function updateAspectRatio() {
+    const ratio = document.getElementById('aspect-ratio').value;
+    const currentBanner = document.querySelector('.banner.on');
+    if (currentBanner) {
+        currentBanner.style.aspectRatio = ratio;
+    }
+}
 
 /* === HORÁRIOS === */
 let H={};
@@ -621,13 +661,11 @@ function rP(){
 function rI(){
   sv('bInm','i-nm');sv('bIct','i-ct');sh('bItt','i-tt');sv('bIds','i-ds');sv('bIcl','i-cl');
   sv('bIwp','i-wp');sv('bIig','i-ig');sv('bIen','i-en');
-  g('bIul').innerHTML=['ib1','ib2','ib3','ib4'].map(id=>{
-    const t=g(id).value;return t?`<li>${t}</li>`:''}).join('');
+  const pontos = ['ib1','ib2','ib3','ib4'].map(id => g(id).value).filter(t => t);
+  g('bIul').innerHTML = pontos.map(t => `<li>${t}</li>`).join('');
 }
 
-/* ===================================================
-   DOWNLOAD — sem Google Fonts no banner = sem CORS
-   =================================================== */
+/* === DOWNLOAD === */
 async function baixar(){
   const btn=g('dlBtn');
   btn.textContent='⏳ Gerando...';btn.disabled=true;
@@ -656,8 +694,15 @@ async function baixar(){
   btn.textContent='⬇ Baixar PNG';btn.disabled=false;
 }
 
+/* === REGISTRO DO SERVICE WORKER (PWA) === */
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./service-worker.js').then(reg => console.log('SW registrado', reg)).catch(err => console.log('SW falhou', err));
+}
+
 /* === INIT === */
 rH();rA();rF();rP();rI();
+updateTheme(); // Aplica as cores iniciais
+updateAspectRatio(); // Aplica a proporção inicial
 </script>
 </body>
 </html>
