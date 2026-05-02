@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evolution Fitness – Editor de Banners</title>
+<!-- Google Fonts APENAS para a interface, nunca para os banners -->
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+/* ===== VARIÁVEIS ===== */
+:root{
+  --red:#C8102E; --red2:#a00c22; --gold:#F5C01A;
+  --bg:#0A0A0A; --s1:#111; --s2:#1A1A1A; --s3:#222;
+  --bd:rgba(255,255,255,.08); --mut:#777;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Barlow',Arial,sans-serif;background:var(--bg);color:#fff;height:100vh;overflow:hidden;display:flex;flex-direction:column}
+
+/* ===== HEADER ===== */
+header{background:var(--s1);border-bottom:1px solid var(--bd);padding:12px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.lm{width:30px;height:30px;background:var(--red);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0}
+header h1{font-size:15px;font-weight:700;letter-spacing:.5px}
+header p{color:var(--mut);font-size:11px}
+
+/* ===== TABS ===== */
+.tabs{background:var(--s1);border-bottom:1px solid var(--bd);padding:10px 14px 0;display:flex;gap:2px;overflow-x:auto;flex-shrink:0}
+.tab{padding:7px 13px;border-radius:5px 5px 0 0;border:1px solid transparent;background:transparent;color:var(--mut);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .18s}
+.tab.on{background:var(--bg);border-color:var(--bd);border-bottom-color:var(--bg);color:#fff;margin-bottom:-1px}
+
+/* ===== LAYOUT ===== */
+.layout{display:grid;grid-template-columns:290px 1fr;flex:1;overflow:hidden}
+
+/* ===== SIDEBAR ===== */
+.sb{background:var(--s1);border-right:1px solid var(--bd);overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
+.blk{background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:12px}
+.sec{font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--mut);text-transform:uppercase;margin-bottom:9px}
+label{display:block;font-size:11px;font-weight:600;color:var(--mut);margin-bottom:3px;margin-top:7px}
+label:first-of-type{margin-top:0}
+input,select,textarea{width:100%;background:var(--s3);border:1px solid var(--bd);border-radius:6px;padding:8px 10px;color:#fff;font-family:'Barlow',Arial,sans-serif;font-size:13px;outline:none;transition:border-color .18s;appearance:none}
+textarea{resize:vertical;min-height:56px}
+input:focus,select:focus,textarea:focus{border-color:var(--red)}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn{width:100%;padding:9px;border:none;border-radius:6px;font-weight:700;font-size:13px;cursor:pointer;transition:opacity .18s;margin-top:7px}
+.btn:hover{opacity:.85}
+.br{background:var(--red);color:#fff}
+.bg{background:transparent;border:1px solid var(--bd);color:var(--mut)}
+.bg:hover{border-color:#fff;color:#fff}
+.irow{display:flex;justify-content:space-between;align-items:center;background:var(--s3);border:1px solid var(--bd);border-radius:6px;padding:6px 9px;margin-bottom:4px;font-size:12px}
+.ibadge{background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:2px 5px;border-radius:3px;margin-right:5px}
+.irm{background:none;border:none;color:var(--mut);cursor:pointer;font-size:13px;transition:color .18s}.irm:hover{color:var(--red)}
+.enote{color:var(--mut);font-size:11px;text-align:center;padding:12px;border:1px dashed var(--bd);border-radius:6px}
+
+/* ===== PREVIEW ===== */
+.pv{background:#181818;overflow:auto;display:flex;flex-direction:column;align-items:center;padding:20px}
+.ptb{display:flex;gap:8px;margin-bottom:14px;align-self:stretch;justify-content:flex-end}
+.ptb button{padding:7px 15px;border-radius:6px;border:1px solid var(--bd);background:var(--s2);color:#fff;font-size:12px;font-weight:600;cursor:pointer;transition:opacity .18s}
+.ptb button:hover{opacity:.8}
+.ptb .dl{background:var(--gold);color:#000;border-color:var(--gold);font-size:13px}
+.ptb button:disabled{opacity:.5;cursor:not-allowed}
+
+/* ===== PANELS ===== */
+.panel{display:none}.panel.on{display:block}
+
+/* ===================================================
+   BANNERS — SISTEMA DE FONTES: Impact/Arial Black/Arial
+   SEM nenhuma dependência externa = download funciona
+   =================================================== */
+.banner{display:none;width:430px;flex-direction:column;background:#0D0D0D;overflow:hidden}
+.banner.on{display:flex}
+
+/* Fonte base dos banners */
+.banner *{font-family:Impact,'Arial Black',Arial,sans-serif}
+
+/* ── BANNER 1: HORÁRIOS ── */
+#bH{border:3px solid var(--red);border-radius:12px}
+.bH-top{background:var(--red);padding:11px 16px;display:flex;justify-content:space-between;align-items:center}
+.bH-nome{font-size:20px;font-weight:900;letter-spacing:1px}
+.bH-sub{font-size:9px;color:rgba(255,255,255,.7);letter-spacing:3px;margin-top:1px}
+.bH-tag{font-size:9px;letter-spacing:1.5px;opacity:.8}
+.bH-body{padding:14px 16px}
+.bH-title{text-align:center;font-size:18px;letter-spacing:3px;margin-bottom:12px;color:rgba(255,255,255,.9)}
+.bH-table{width:100%;border-collapse:collapse}
+.bH-table thead th{background:#1C1C1C;color:var(--gold);font-size:11px;letter-spacing:1px;padding:8px 4px;border:1px solid rgba(255,255,255,.07);text-align:center}
+.bH-table thead th:first-child{color:rgba(255,255,255,.35);font-size:9px}
+.bH-table tbody td{border:1px solid rgba(255,255,255,.05);padding:7px 4px;text-align:center;font-size:10px;color:rgba(255,255,255,.4);background:#0F0F0F}
+.bH-table tbody td:first-child{font-size:12px;font-weight:700;color:rgba(255,255,255,.8);background:#161616}
+.bH-c{background:var(--red);color:#fff;font-size:9px;font-weight:700;letter-spacing:.5px;padding:3px 6px;border-radius:4px;display:inline-block}
+.bH-foot{margin-top:11px;text-align:center;font-size:10px;color:rgba(255,255,255,.35);border-top:1px solid rgba(255,255,255,.05);padding-top:9px;font-family:Arial,sans-serif}
+.bH-foot strong{color:var(--gold)}
+
+/* ── BANNER 2: HOJE TEM AULA ── */
+#bA{border:3px solid var(--red);border-radius:12px;overflow:hidden}
+#bA .top{background:linear-gradient(180deg,#0D0D0D,#1a0608 50%,#0D0D0D)}
+.bA-hd{padding:14px 18px 8px;text-align:center;border-bottom:1px solid rgba(255,255,255,.05)}
+.bA-ac{font-size:13px;letter-spacing:4px;color:rgba(255,255,255,.85)}
+.bA-ct{font-size:8px;letter-spacing:3px;color:rgba(255,255,255,.35)}
+.bA-np{font-size:8px;letter-spacing:2px;color:var(--red);font-family:Arial,sans-serif;font-weight:700;margin-top:2px}
+.bA-hero{padding:18px 18px 8px;text-align:center}
+.bA-hj{font-size:38px;font-weight:900;letter-spacing:2px;line-height:1;color:#fff}
+.bA-ab{background:#fff;display:inline-block;padding:2px 20px;margin:4px 0}
+.bA-at{font-size:44px;font-weight:900;color:var(--red);letter-spacing:2px;line-height:1.05}
+.bA-vm{font-size:26px;letter-spacing:1px;color:rgba(255,255,255,.9);line-height:1.1}
+.bA-body{padding:12px 16px}
+.bA-mi{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.bA-mi:last-child{border:none}
+.bA-mn{font-size:15px;letter-spacing:.5px;color:#fff}
+.bA-mb{background:var(--red);color:#fff;font-size:8px;letter-spacing:.5px;padding:2px 5px;border-radius:3px;display:inline-block;margin-left:5px;vertical-align:middle}
+.bA-md{font-size:10px;color:rgba(255,255,255,.45);font-family:Arial,sans-serif;line-height:1.4;margin-top:2px}
+.bA-cta{background:var(--red);padding:12px 18px;text-align:center}
+.bA-ctat{font-size:15px;letter-spacing:1.5px}
+.bA-ctap{font-size:13px;opacity:.9;font-family:Arial,sans-serif;font-weight:700}
+.bA-ft{padding:9px 18px;display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,.3);font-family:Arial,sans-serif}
+
+/* ── BANNER 3: FERIADO ── */
+#bF{border:3px solid var(--red);border-radius:12px;overflow:hidden}
+.bF-hd{background:#111;padding:14px 18px;text-align:center;border-bottom:2px solid var(--red)}
+.bF-lbl{font-size:11px;letter-spacing:3px;color:rgba(255,255,255,.45)}
+.bF-nome{font-size:22px;letter-spacing:1.5px}
+.bF-body{padding:22px 22px;text-align:center;background:linear-gradient(180deg,#0D0D0D,#180407)}
+.bF-emoji{font-size:36px;margin-bottom:6px;font-family:Arial,sans-serif}
+.bF-tit{font-size:32px;letter-spacing:2px;color:#fff;margin-bottom:2px}
+.bF-datas{font-size:18px;color:var(--red);letter-spacing:.5px;font-family:Arial,sans-serif;font-weight:700;margin:10px 0}
+.bF-div{width:50px;height:2px;background:var(--red);margin:14px auto}
+.bF-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:14px;margin:10px 0}
+.bF-bx1{font-size:10px;letter-spacing:2px;color:rgba(255,255,255,.4);margin-bottom:4px}
+.bF-bx2{font-size:34px;letter-spacing:1px;color:#fff}
+.bF-obs{font-size:11px;color:rgba(255,255,255,.35);font-family:Arial,sans-serif;margin-top:14px}
+.bF-cta{background:var(--red);padding:12px 18px;text-align:center}
+.bF-ft{padding:9px 18px;display:flex;justify-content:center;gap:18px;font-size:9px;color:rgba(255,255,255,.3);font-family:Arial,sans-serif}
+
+/* ── BANNER 4: PLANOS ── */
+#bP{border:3px solid var(--red);border-radius:12px;overflow:hidden}
+.bP-hd{background:#111;padding:13px 18px;text-align:center;border-bottom:1px solid var(--bd)}
+.bP-ct{font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.35)}
+.bP-br{font-size:13px;letter-spacing:3px;color:rgba(255,255,255,.7)}
+.bP-tt{font-size:26px;letter-spacing:2px}
+.bP-sb{background:var(--red);display:inline-block;padding:2px 14px;margin-top:3px}
+.bP-sb span{font-size:17px;letter-spacing:2px}
+.bP-body{padding:14px 16px}
+.bP-lb{text-align:center;font-size:10px;letter-spacing:1.5px;color:rgba(255,255,255,.4);margin-bottom:12px;font-family:Arial,sans-serif}
+.bP-cards{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:9px}
+.bP-card{background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:13px;text-align:center;position:relative}
+.bP-card.dst{border-color:var(--red)}
+.bP-mais{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--red);color:#fff;font-size:8px;letter-spacing:1px;padding:2px 9px;border-radius:20px;white-space:nowrap}
+.bP-pn{font-size:13px;letter-spacing:2px;color:rgba(255,255,255,.65)}
+.bP-pc{font-size:9px;color:rgba(255,255,255,.35);font-family:Arial,sans-serif}
+.bP-pr{font-size:34px;letter-spacing:0;color:#fff;line-height:1.05}
+.bP-rc{font-size:8px;letter-spacing:1px;color:rgba(255,255,255,.35);font-family:Arial,sans-serif}
+.bP-nt{background:rgba(255,255,255,.04);border-radius:6px;padding:8px;text-align:center;font-size:9px;color:rgba(255,255,255,.35);font-family:Arial,sans-serif}
+.bP-cta{background:var(--red);padding:12px 18px;text-align:center}
+.bP-ft{padding:8px 18px;display:flex;justify-content:center;gap:14px;font-size:9px;color:rgba(255,255,255,.3);font-family:Arial,sans-serif}
+
+/* ── BANNER 5: INSTITUCIONAL ── */
+#bI{border:3px solid rgba(255,255,255,.08);border-radius:12px;overflow:hidden}
+.bI-hd{background:#1C1C1C;padding:13px 18px;text-align:center}
+.bI-br{font-size:17px;letter-spacing:4px}
+.bI-ct{font-size:8px;letter-spacing:2px;color:rgba(255,255,255,.3)}
+.bI-body{padding:18px 20px;background:#1e1e1e}
+.bI-tt{font-size:42px;line-height:1.02;letter-spacing:.5px;margin-bottom:14px}
+.bI-dv{width:36px;height:3px;background:var(--red);margin-bottom:13px}
+.bI-ds{font-size:11px;color:rgba(255,255,255,.55);font-family:Arial,sans-serif;line-height:1.6;margin-bottom:13px}
+.bI-ul{list-style:none}
+.bI-ul li{font-size:11px;font-family:Arial,sans-serif;font-weight:700;color:rgba(255,255,255,.85);padding:5px 0 5px 13px;position:relative}
+.bI-ul li::before{content:'●';color:var(--red);position:absolute;left:0;font-size:7px;top:8px}
+.bI-cta{background:var(--red);padding:13px 20px}
+.bI-cl{font-size:11px;letter-spacing:2px;color:rgba(255,255,255,.8);margin-bottom:4px}
+.bI-ci{font-size:10px;color:rgba(255,255,255,.75);font-family:Arial,sans-serif;line-height:1.6}
+.bI-tgs{background:#1C1C1C;padding:9px 20px;display:flex;justify-content:space-between}
+.bI-tg{font-size:7px;letter-spacing:1.5px;color:rgba(255,255,255,.25)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="lm">EF</div>
+  <div>
+    <h1>EVOLUTION FITNESS <span style="color:var(--gold)">STUDIO</span></h1>
+    <p>Editor de Banners</p>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab on"  onclick="aba('H',this)">📅 Horários</button>
+  <button class="tab"     onclick="aba('A',this)">🔥 Hoje Tem Aula</button>
+  <button class="tab"     onclick="aba('F',this)">📌 Feriado</button>
+  <button class="tab"     onclick="aba('P',this)">💳 Planos</button>
+  <button class="tab"     onclick="aba('I',this)">🏋️ Institucional</button>
+</div>
+
+<div class="layout">
+
+<!-- ═══════════════ SIDEBAR ═══════════════ -->
+<div class="sb">
+
+  <!-- HORÁRIOS -->
+  <div class="panel on" id="pH">
+    <div class="blk">
+      <div class="sec">Informações</div>
+      <label>Nome</label><input id="h-nm" value="EVOLUTION FITNESS" oninput="rH()">
+      <label>Cidade</label><input id="h-ct" value="TRÊS RIOS — RJ" oninput="rH()">
+      <label>WhatsApp</label><input id="h-wp" value="(24) 98143-3386" oninput="rH()">
+      <label>Instagram</label><input id="h-ig" value="@evolutionfitness_tr" oninput="rH()">
+    </div>
+    <div class="blk">
+      <div class="sec">Adicionar Aula</div>
+      <div class="r2">
+        <div><label>Horário</label><input id="hh" placeholder="Ex: 19:00"></div>
+        <div><label>Dia</label>
+          <select id="hd"><option>SEG</option><option>TER</option><option>QUA</option><option>QUI</option><option>SEX</option><option>SAB</option></select>
+        </div>
+      </div>
+      <label>Nome da Aula</label><input id="ha" placeholder="PUMP, GAP, SPINNING...">
+      <button class="btn br" onclick="addA()">+ Adicionar</button>
+    </div>
+    <div class="blk">
+      <div class="sec">Aulas cadastradas</div>
+      <div id="listaA"><div class="enote">Nenhuma aula ainda.</div></div>
+      <button class="btn bg" onclick="limA()">🗑 Limpar tudo</button>
+    </div>
+  </div>
+
+  <!-- HOJE TEM AULA -->
+  <div class="panel" id="pA">
+    <div class="blk">
+      <div class="sec">Cabeçalho</div>
+      <label>Nome</label><input id="a-nm" value="EVOLUTION FITNESS" oninput="rA()">
+      <label>Cidade</label><input id="a-ct" value="TRÊS RIOS — RJ" oninput="rA()">
+    </div>
+    <div class="blk">
+      <div class="sec">Adicionar Modalidade</div>
+      <div id="listaMod"><div class="enote">Nenhuma modalidade.</div></div>
+      <label>Nome</label><input id="mn" placeholder="Ex: PUMP">
+      <label>Categoria</label><input id="mb" placeholder="Ex: MUSCULAÇÃO">
+      <label>Descrição</label><input id="md" placeholder="Breve descrição">
+      <button class="btn br" onclick="addM()">+ Adicionar</button>
+    </div>
+    <div class="blk">
+      <div class="sec">Rodapé</div>
+      <label>WhatsApp</label><input id="a-wp" value="(24) 98143-3386" oninput="rA()">
+      <label>Instagram</label><input id="a-ig" value="@evolutionfitness_tr" oninput="rA()">
+      <label>Endereço</label><input id="a-en" value="R. Dr. Walmir Pecanha, 50" oninput="rA()">
+    </div>
+  </div>
+
+  <!-- FERIADO -->
+  <div class="panel" id="pF">
+    <div class="blk">
+      <div class="sec">Informações</div>
+      <label>Nome</label><input id="f-nm" value="EVOLUTION FITNESS" oninput="rF()">
+      <label>Data(s)</label><input id="f-dt" value="21/04/2026 e 23/04/2026" oninput="rF()">
+      <label>Horário especial</label><input id="f-hr" value="08h às 14h" oninput="rF()">
+      <label>Observação</label><input id="f-ob" value="Nos demais dias, horário normal." oninput="rF()">
+      <label>WhatsApp</label><input id="f-wp" value="(24) 98143-3386" oninput="rF()">
+      <label>Instagram</label><input id="f-ig" value="@evolutionfitness_tr" oninput="rF()">
+      <label>Endereço</label><input id="f-en" value="R. Dr. Walmir Pecanha, 89" oninput="rF()">
+    </div>
+  </div>
+
+  <!-- PLANOS -->
+  <div class="panel" id="pP">
+    <div class="blk">
+      <div class="sec">Cabeçalho</div>
+      <label>Nome</label><input id="p-nm" value="EVOLUTION FITNESS" oninput="rP()">
+      <label>Cidade</label><input id="p-ct" value="TRÊS RIOS — RJ" oninput="rP()">
+      <label>Título</label><input id="p-tt" value="EVOLUTION TOTAL" oninput="rP()">
+      <label>Subtítulo</label><input id="p-sb" value="ACESSO LIVRE" oninput="rP()">
+    </div>
+    <div class="blk">
+      <div class="sec">Plano 1 (esquerda)</div>
+      <label>Nome</label><input id="p1n" value="SEMESTRAL" oninput="rP()">
+      <label>Parcelas</label><input id="p1c" value="6x de" oninput="rP()">
+      <label>Valor</label><input id="p1v" value="R$105" oninput="rP()">
+      <label>Rodapé</label><input id="p1t" value="PLANO RECORRENTE" oninput="rP()">
+    </div>
+    <div class="blk">
+      <div class="sec">Plano 2 (destaque)</div>
+      <label>Nome</label><input id="p2n" value="ANUAL" oninput="rP()">
+      <label>Parcelas</label><input id="p2c" value="12x de" oninput="rP()">
+      <label>Valor</label><input id="p2v" value="R$100" oninput="rP()">
+      <label>Rodapé</label><input id="p2t" value="PLANO RECORRENTE" oninput="rP()">
+      <label>Tag destaque</label><input id="p2g" value="MAIS VANTAJOSO" oninput="rP()">
+    </div>
+    <div class="blk">
+      <div class="sec">Rodapé</div>
+      <label>Nota</label><input id="p-nt" value="Cobrança mensal automática — sem comprometer o limite do cartão" oninput="rP()">
+      <label>WhatsApp</label><input id="p-wp" value="(24) 98143-3386" oninput="rP()">
+      <label>Instagram</label><input id="p-ig" value="@evolutionfitness_tr" oninput="rP()">
+      <label>Endereço</label><input id="p-en" value="R. Dr. Walmir Peçanha, 50 — Sl. 206/208" oninput="rP()">
+    </div>
+  </div>
+
+  <!-- INSTITUCIONAL -->
+  <div class="panel" id="pI">
+    <div class="blk">
+      <div class="sec">Cabeçalho</div>
+      <label>Nome</label><input id="i-nm" value="EVOLUTION FITNESS" oninput="rI()">
+      <label>Cidade</label><input id="i-ct" value="TRÊS RIOS — RJ" oninput="rI()">
+    </div>
+    <div class="blk">
+      <div class="sec">Conteúdo</div>
+      <label>Título</label><textarea id="i-tt" oninput="rI()">SEU CORPO
+MERECE
+O MELHOR</textarea>
+      <label>Descrição</label><textarea id="i-ds" oninput="rI()">A academia que cuida de você de verdade. Atenção individual, treino no seu ritmo, professores que te conhecem pelo nome.</textarea>
+      <label>• Ponto 1</label><input id="ib1" value="Treinos adaptados para cada fase da vida" oninput="rI()">
+      <label>• Ponto 2</label><input id="ib2" value="Atenção e cuidado individual com cada aluno" oninput="rI()">
+      <label>• Ponto 3</label><input id="ib3" value="Ambiente acolhedor — você não é só um número" oninput="rI()">
+      <label>• Ponto 4</label><input id="ib4" value="Especialmente pensada para o público 30+" oninput="rI()">
+    </div>
+    <div class="blk">
+      <div class="sec">CTA</div>
+      <label>Chamada</label><input id="i-cl" value="VENHA FAZER SUA AULA EXPERIMENTAL" oninput="rI()">
+      <label>WhatsApp</label><input id="i-wp" value="(24) 98143-3386" oninput="rI()">
+      <label>Instagram</label><input id="i-ig" value="@evolutionfitness_tr" oninput="rI()">
+      <label>Endereço</label><input id="i-en" value="R. Dr. Walmir Pecanha, 50 — Salas 206/208" oninput="rI()">
+    </div>
+  </div>
+
+</div><!-- /sb -->
+
+<!-- ═══════════════ PREVIEW ═══════════════ -->
+<div class="pv">
+  <div class="ptb">
+    <button class="dl" id="dlBtn" onclick="baixar()">⬇ Baixar PNG</button>
+  </div>
+
+  <!-- BANNER HORÁRIOS -->
+  <div class="banner on" id="bH">
+    <div class="bH-top">
+      <div>
+        <div class="bH-nome" id="bHnm">EVOLUTION FITNESS</div>
+        <div class="bH-sub" id="bHct">TRÊS RIOS — RJ</div>
+      </div>
+      <div class="bH-tag">HORÁRIOS DE AULAS COLETIVAS</div>
+    </div>
+    <div class="bH-body">
+      <div class="bH-title">QUADRO DE HORÁRIOS</div>
+      <table class="bH-table">
+        <thead><tr><th>HOR.</th><th>SEG</th><th>TER</th><th>QUA</th><th>QUI</th><th>SEX</th><th>SAB</th></tr></thead>
+        <tbody id="bHcorpo"><tr><td colspan="7" style="color:rgba(255,255,255,.2);padding:18px;text-align:center;font-size:10px;font-family:Arial">Adicione aulas no painel →</td></tr></tbody>
+      </table>
+      <div class="bH-foot"><strong id="bHwp">(24) 98143-3386</strong> &nbsp;|&nbsp; <span id="bHig">@evolutionfitness_tr</span></div>
+    </div>
+  </div>
+
+  <!-- BANNER HOJE TEM AULA -->
+  <div class="banner" id="bA">
+    <div style="border:3px solid var(--red);border-radius:12px;overflow:hidden;background:linear-gradient(180deg,#0D0D0D,#1a0608 55%,#0D0D0D)">
+      <div class="bA-hd">
+        <div class="bA-ct" id="bAct">TRÊS RIOS — RJ</div>
+        <div class="bA-ac" id="bAnm">EVOLUTION FITNESS</div>
+        <div class="bA-np">NÃO PERCA ESSA!</div>
+      </div>
+      <div class="bA-hero">
+        <div class="bA-hj">HOJE TEM</div>
+        <div class="bA-ab"><div class="bA-at">AULA!</div></div>
+        <div class="bA-vm">VEM TREINAR<br>COM A GENTE</div>
+      </div>
+      <div class="bA-body" id="bAmod"></div>
+      <div class="bA-cta">
+        <div class="bA-ctat">NÃO PERCA — VENHA HOJE!</div>
+        <div class="bA-ctap" id="bAwp">(24) 98143-3386</div>
+      </div>
+      <div class="bA-ft">
+        <span id="bAig">@evolutionfitness_tr</span>
+        <span id="bAen">R. Dr. Walmir Pecanha, 50</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- BANNER FERIADO -->
+  <div class="banner" id="bF">
+    <div class="bF-hd">
+      <div class="bF-lbl">COMUNICADO</div>
+      <div class="bF-nome" id="bFnm">EVOLUTION FITNESS</div>
+    </div>
+    <div class="bF-body">
+      <div class="bF-emoji">📅</div>
+      <div class="bF-tit">FERIADO</div>
+      <div class="bF-datas" id="bFdt">21/04/2026 e 23/04/2026</div>
+      <div class="bF-div"></div>
+      <div class="bF-box">
+        <div class="bF-bx1">HORÁRIO DE FUNCIONAMENTO DA ACADEMIA</div>
+        <div class="bF-bx2" id="bFhr">08h às 14h</div>
+      </div>
+      <div class="bF-obs" id="bFob">Nos demais dias, horário normal.</div>
+    </div>
+    <div class="bF-cta">
+      <div style="font-size:11px;letter-spacing:2px;margin-bottom:3px">DÚVIDAS? FALE COM A GENTE</div>
+      <div style="font-size:15px;font-family:Arial,sans-serif;font-weight:700" id="bFwp">(24) 98143-3386</div>
+    </div>
+    <div class="bF-ft">
+      <span id="bFig">@evolutionfitness_tr</span>
+      <span id="bFen">R. Dr. Walmir Pecanha, 89</span>
+    </div>
+  </div>
+
+  <!-- BANNER PLANOS -->
+  <div class="banner" id="bP">
+    <div class="bP-hd">
+      <div class="bP-ct" id="bPct">TRÊS RIOS — RJ</div>
+      <div class="bP-br" id="bPnm">EVOLUTION FITNESS</div>
+      <div class="bP-tt" id="bPtt">EVOLUTION TOTAL</div>
+      <div class="bP-sb"><span id="bPsb">ACESSO LIVRE</span></div>
+    </div>
+    <div class="bP-body">
+      <div class="bP-lb">PLANO SEMESTRAL E ANUAL RECORRENTE<br><span style="font-size:8px;opacity:.6">(Sem comprometer o limite do seu cartão)</span></div>
+      <div class="bP-cards">
+        <div class="bP-card">
+          <div class="bP-pn" id="bP1n">SEMESTRAL</div>
+          <div class="bP-pc" id="bP1c">6x de</div>
+          <div class="bP-pr" id="bP1v">R$105</div>
+          <div class="bP-rc" id="bP1t">PLANO RECORRENTE</div>
+        </div>
+        <div class="bP-card dst">
+          <div class="bP-mais" id="bP2g">MAIS VANTAJOSO</div>
+          <div class="bP-pn" id="bP2n">ANUAL</div>
+          <div class="bP-pc" id="bP2c">12x de</div>
+          <div class="bP-pr" id="bP2v">R$100</div>
+          <div class="bP-rc" id="bP2t">PLANO RECORRENTE</div>
+        </div>
+      </div>
+      <div class="bP-nt" id="bPnt">Cobrança mensal automática — sem comprometer o limite do cartão</div>
+    </div>
+    <div class="bP-cta">
+      <div style="font-size:14px;letter-spacing:2px">GARANTA O SEU AGORA!</div>
+      <div style="font-size:13px;font-family:Arial,sans-serif;font-weight:700;opacity:.9" id="bPwp">(24) 98143-3386</div>
+    </div>
+    <div class="bP-ft">
+      <span id="bPig">@evolutionfitness_tr</span>
+      <span id="bPen">R. Dr. Walmir Peçanha, 50 — Sl. 206/208</span>
+    </div>
+  </div>
+
+  <!-- BANNER INSTITUCIONAL -->
+  <div class="banner" id="bI">
+    <div class="bI-hd">
+      <div class="bI-br" id="bInm">EVOLUTION FITNESS</div>
+      <div class="bI-ct" id="bIct">TRÊS RIOS — RJ</div>
+    </div>
+    <div class="bI-body">
+      <div class="bI-tt" id="bItt">SEU CORPO<br>MERECE<br>O MELHOR</div>
+      <div class="bI-dv"></div>
+      <div class="bI-ds" id="bIds">A academia que cuida de você de verdade. Atenção individual, treino no seu ritmo, professores que te conhecem pelo nome.</div>
+      <ul class="bI-ul" id="bIul">
+        <li>Treinos adaptados para cada fase da vida</li>
+        <li>Atenção e cuidado individual com cada aluno</li>
+        <li>Ambiente acolhedor — você não é só um número</li>
+        <li>Especialmente pensada para o público 30+</li>
+      </ul>
+    </div>
+    <div class="bI-cta">
+      <div class="bI-cl" id="bIcl">VENHA FAZER SUA AULA EXPERIMENTAL</div>
+      <div class="bI-ci">WhatsApp: <strong id="bIwp">(24) 98143-3386</strong><br>Instagram: <span id="bIig">@evolutionfitness_tr</span><br><span id="bIen">R. Dr. Walmir Pecanha, 50 — Salas 206/208</span></div>
+    </div>
+    <div class="bI-tgs">
+      <span class="bI-tg">MUSCULAÇÃO</span>
+      <span class="bI-tg">FUNCIONAL</span>
+      <span class="bI-tg">SAÚDE E BEM-ESTAR</span>
+      <span class="bI-tg">RESULTADOS REAIS</span>
+    </div>
+  </div>
+
+</div><!-- /pv -->
+</div><!-- /layout -->
+
+<script>
+/* === ABA === */
+let abaId='H';
+function aba(id,el){
+  abaId=id;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.banner').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('p'+id).classList.add('on');
+  document.getElementById('b'+id).classList.add('on');
+}
+
+/* === UTIL === */
+const D=['SEG','TER','QUA','QUI','SEX','SAB'];
+function g(id){return document.getElementById(id)}
+function sv(dst,src){const d=g(dst);const s=g(src);if(d&&s)d.textContent=s.value}
+function sh(dst,src){const d=g(dst);const s=g(src);if(d&&s)d.innerHTML=s.value.replace(/\n/g,'<br>')}
+
+/* === HORÁRIOS === */
+let H={};
+function addA(){
+  const h=g('hh').value.trim(),d=g('hd').value,a=g('ha').value.trim().toUpperCase();
+  if(!h||!a){alert('Preencha horário e nome.');return;}
+  if(!H[h])H[h]={};
+  H[h][d]=a;g('hh').value='';g('ha').value='';
+  rListaH();rH();
+}
+function remA(h,d){delete H[h][d];if(!Object.keys(H[h]).length)delete H[h];rListaH();rH();}
+function limA(){if(confirm('Limpar tudo?')){H={};rListaH();rH();}}
+function rListaH(){
+  const el=g('listaA'),hs=Object.keys(H).sort();
+  if(!hs.length){el.innerHTML='<div class="enote">Nenhuma aula ainda.</div>';return;}
+  el.innerHTML=hs.flatMap(h=>D.filter(d=>H[h]&&H[h][d]).map(d=>
+    `<div class="irow"><div><span class="ibadge">${d}</span>${h} — ${H[h][d]}</div><button class="irm" onclick="remA('${h}','${d}')">✕</button></div>`
+  )).join('');
+}
+function rH(){
+  sv('bHnm','h-nm');sv('bHct','h-ct');sv('bHwp','h-wp');sv('bHig','h-ig');
+  const hs=Object.keys(H).sort(),c=g('bHcorpo');
+  if(!hs.length){c.innerHTML='<tr><td colspan="7" style="color:rgba(255,255,255,.2);padding:18px;text-align:center;font-size:10px;font-family:Arial">Adicione aulas no painel →</td></tr>';return;}
+  c.innerHTML=hs.map(h=>{
+    let r=`<tr><td>${h}</td>`;
+    D.forEach(d=>{r+=H[h]&&H[h][d]?`<td><span class="bH-c">${H[h][d]}</span></td>`:'<td></td>';});
+    return r+'</tr>';
+  }).join('');
+}
+
+/* === HOJE TEM AULA === */
+let M=[
+  {n:'PUMP',b:'MUSCULAÇÃO',d:'Tonifica e define os músculos. Para todos os níveis.'},
+  {n:'SPINNING',b:'CARDIO',d:'Queima intensa de calorias. Fortalece pernas e glúteos.'},
+  {n:'FUNCIONAL',b:'CONDIÇÃO FÍSICA',d:'Melhora equilíbrio, agilidade e postura.'},
+];
+function addM(){
+  const n=g('mn').value.trim().toUpperCase(),b=g('mb').value.trim().toUpperCase(),d=g('md').value.trim();
+  if(!n)return;
+  M.push({n,b:b||'AULA',d});g('mn').value='';g('mb').value='';g('md').value='';rA();
+}
+function remM(i){M.splice(i,1);rA();}
+function rA(){
+  sv('bAnm','a-nm');sv('bAct','a-ct');sv('bAwp','a-wp');sv('bAig','a-ig');sv('bAen','a-en');
+  g('listaMod').innerHTML=M.length
+    ?M.map((m,i)=>`<div class="irow"><div><span class="ibadge">${m.b}</span>${m.n}</div><button class="irm" onclick="remM(${i})">✕</button></div>`).join('')
+    :'<div class="enote">Nenhuma modalidade.</div>';
+  g('bAmod').innerHTML=M.map(m=>`
+    <div class="bA-mi">
+      <div style="flex:1">
+        <div><span class="bA-mn">${m.n}</span><span class="bA-mb">${m.b}</span></div>
+        <div class="bA-md">${m.d}</div>
+      </div>
+    </div>`).join('');
+}
+
+/* === FERIADO === */
+function rF(){sv('bFnm','f-nm');sv('bFdt','f-dt');sv('bFhr','f-hr');sv('bFob','f-ob');sv('bFwp','f-wp');sv('bFig','f-ig');sv('bFen','f-en');}
+
+/* === PLANOS === */
+function rP(){
+  sv('bPnm','p-nm');sv('bPct','p-ct');sv('bPtt','p-tt');sv('bPsb','p-sb');
+  sv('bP1n','p1n');sv('bP1c','p1c');sv('bP1v','p1v');sv('bP1t','p1t');
+  sv('bP2n','p2n');sv('bP2c','p2c');sv('bP2v','p2v');sv('bP2t','p2t');sv('bP2g','p2g');
+  sv('bPnt','p-nt');sv('bPwp','p-wp');sv('bPig','p-ig');sv('bPen','p-en');
+}
+
+/* === INSTITUCIONAL === */
+function rI(){
+  sv('bInm','i-nm');sv('bIct','i-ct');sh('bItt','i-tt');sv('bIds','i-ds');sv('bIcl','i-cl');
+  sv('bIwp','i-wp');sv('bIig','i-ig');sv('bIen','i-en');
+  g('bIul').innerHTML=['ib1','ib2','ib3','ib4'].map(id=>{
+    const t=g(id).value;return t?`<li>${t}</li>`:''}).join('');
+}
+
+/* ===================================================
+   DOWNLOAD — sem Google Fonts no banner = sem CORS
+   =================================================== */
+async function baixar(){
+  const btn=g('dlBtn');
+  btn.textContent='⏳ Gerando...';btn.disabled=true;
+
+  const el=g('b'+abaId);
+  const nomes={H:'evolution-horarios',A:'evolution-hoje-tem-aula',F:'evolution-feriado',P:'evolution-planos',I:'evolution-institucional'};
+
+  try{
+    const canvas=await html2canvas(el,{
+      scale:2,
+      useCORS:false,      // sem recursos externos nos banners
+      allowTaint:false,   // canvas limpo = toDataURL funciona
+      backgroundColor:'#0D0D0D',
+      logging:false,
+      width:el.offsetWidth,
+      height:el.offsetHeight
+    });
+    const a=document.createElement('a');
+    a.download=(nomes[abaId]||'banner')+'.png';
+    a.href=canvas.toDataURL('image/png');
+    a.click();
+  }catch(e){
+    alert('Erro: '+e.message);
+  }
+
+  btn.textContent='⬇ Baixar PNG';btn.disabled=false;
+}
+
+/* === INIT === */
+rH();rA();rF();rP();rI();
+</script>
+</body>
+</html>
